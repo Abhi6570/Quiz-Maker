@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Quiz Maker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Online Quiz Maker</h1>
+    </header>
+
+    <main>
+        <section id="quizBuilder">
+            <h2>Create a Quiz</h2>
+            <form id="quizForm">
+                <label for="question">Question:</label>
+                <input type="text" id="question" name="question" required>
+                
+                <label for="option1">Option 1:</label>
+                <input type="text" id="option1" name="option1" required>
+                
+                <label for="option2">Option 2:</label>
+                <input type="text" id="option2" name="option2" required>
+                
+                <label for="option3">Option 3:</label>
+                <input type="text" id="option3" name="option3" required>
+                
+                <label for="option4">Option 4:</label>
+                <input type="text" id="option4" name="option4" required>
+                
+                <label for="correctAnswer">Correct Answer:</label>
+                <select id="correctAnswer" name="correctAnswer" required>
+                    <option value="1">Option 1</option>
+                    <option value="2">Option 2</option>
+                    <option value="3">Option 3</option>
+                    <option value="4">Option 4</option>
+                </select>
+
+                <button type="button" onclick="addQuestion()">Add Question</button>
+            </form>
+            <button onclick="createQuiz()">Create Quiz</button>
+        </section>
+
+        <section id="quizTaker" style="display: none;">
+            <h2>Take a Quiz</h2>
+            <div id="quizContainer"></div>
+            <button onclick="submitQuiz()">Submit Quiz</button>
+            <div id="quizResult"></div>
+        </section>
+    </main>
+
+    <script>
+        let quizQuestions = [];
+
+function addQuestion() {
+    const question = document.getElementById('question').value;
+    const option1 = document.getElementById('option1').value;
+    const option2 = document.getElementById('option2').value;
+    const option3 = document.getElementById('option3').value;
+    const option4 = document.getElementById('option4').value;
+    const correctAnswerIndex = document.getElementById('correctAnswer').value - 1;
+
+    const newQuestion = {
+        question: question,
+        options: [option1, option2, option3, option4],
+        correctAnswer: correctAnswerIndex
+    };
+
+    quizQuestions.push(newQuestion);
+    document.getElementById('quizForm').reset();
+    console.log('Question added:', newQuestion);
+}
+
+function createQuiz() {
+    if (quizQuestions.length === 0) {
+        alert('Please add at least one question to create the quiz.');
+        return;
+    }
+
+    const quizContainer = document.getElementById('quizContainer');
+    quizContainer.innerHTML = ''; // Clear previous content
+
+    quizQuestions.forEach((question, index) => {
+        const quizItem = document.createElement('div');
+        quizItem.classList.add('quiz-item');
+        quizItem.innerHTML = `
+            <p><strong>Question ${index + 1}:</strong> ${question.question}</p>
+            <ul>
+                <li><label><input type="radio" name="question${index}" value="0"> ${question.options[0]}</label></li>
+                <li><label><input type="radio" name="question${index}" value="1"> ${question.options[1]}</label></li>
+                <li><label><input type="radio" name="question${index}" value="2"> ${question.options[2]}</label></li>
+                <li><label><input type="radio" name="question${index}" value="3"> ${question.options[3]}</label></li>
+            </ul>
+        `;
+        quizContainer.appendChild(quizItem);
+    });
+
+    // Hide quiz builder, show quiz taker section
+    document.getElementById('quizBuilder').style.display = 'none';
+    document.getElementById('quizTaker').style.display = 'block';
+}
+
+function submitQuiz() {
+    const quizItems = document.querySelectorAll('.quiz-item');
+    let score = 0;
+
+    quizItems.forEach((quizItem, index) => {
+        const selectedOption = quizItem.querySelector(`input[name="question${index}"]:checked`);
+        if (selectedOption) {
+            const selectedAnswer = parseInt(selectedOption.value);
+            if (selectedAnswer === quizQuestions[index].correctAnswer) {
+                score++;
+            }
+        }
+    });
+
+    const totalQuestions = quizQuestions.length;
+    const percentageScore = (score / totalQuestions) * 100;
+
+    const quizResult = document.getElementById('quizResult');
+    quizResult.innerHTML = `Your Score: ${score} out of ${totalQuestions} (${percentageScore.toFixed(2)}%)`;
+
+    // Scroll to quiz result
+    quizResult.scrollIntoView({ behavior: 'smooth' });
+}
+
+    </script>
+</body>
+</html>
